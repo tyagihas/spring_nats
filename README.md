@@ -13,8 +13,9 @@ Adding dependency to Maven pom.xml
 </dependency>
 ```
 
-### Configuration
+### Configuration 
 
+application-context.xml
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <beans xmlns=...>
@@ -92,26 +93,25 @@ public class MyBean2 {
 	}	
 }
 
-// Auto-expiring subscriptions and sending requests
+// Subscription expires based on timeout or number of processed messages 
 public class MyBean2 {
-	private String addr;
-	
-	public MyBean2() {}
-	public String getAddr() { return addr; }
-	public void setAddr(String addr) { this.addr = addr; }
-	
-	// Subscription expires based on timeout or number of processed messages 
+	...
+
 	@Subscribe(value="hoo", timeout=10, limit=5)
 	public void handleMessageAutoUnsub(String subject, String message) {
 		System.out.println("MyBean2 Received : " + message);
 	}
-	
-	// Sending a request and receiving a response from a subscriber
+}	
+
+// Sending a request and receiving a response from a subscriber
+public class MyBean2 {
+	...
+
 	@Request("help")
 	public void handleRequest(String response) {
 		System.out.println("MyBean2 Got a response for help : " + response);
 	}
-} 
+}
 ```
 
 ## License
