@@ -10,14 +10,11 @@
 
    <xsd:element name="config">
       <xsd:complexType>
-         <xsd:complexContent>
-            <xsd:extension base="beans:identifiedType">
-               <xsd:attribute name="uri" type="xsd:string" use="required"/>
-               <xsd:attribute name="reconnect" type="xsd:boolean"/>
-               <xsd:attribute name="max_reconnect_attempts" type="xsd:int"/>
-               <xsd:attribute name="reconnect_time_wait" type="xsd:int"/>
-            </xsd:extension>
-         </xsd:complexContent>
+      	<xsd:attribute name="id" type="xsd:string" default="nats"/>
+      	<xsd:attribute name="uri" type="xsd:string"/>
+      	<xsd:attribute name="reconnect" type="xsd:boolean"/>
+      	<xsd:attribute name="max_reconnect_attempts" type="xsd:int"/>
+      	<xsd:attribute name="max_reconnect_time_wait" type="xsd:int"/>
       </xsd:complexType>
    </xsd:element>
 
