@@ -1,5 +1,6 @@
 # Spring_Nats
-Spring implementation for [NATS messaging system](http://nats.io). Annotated Java Bean instances can communicate each other based on roboust NATS messaging system.
+Spring implementation for [NATS messaging system](http://nats.io).
+Annotated Java Bean instances can communicate each other based on robust NATS messaging system.
 
 ## Getting Started
 
