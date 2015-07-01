@@ -1,5 +1,7 @@
 package org.nats.spring.beans;
 
+import org.nats.spring.Key;
+import org.nats.spring.Publish;
 import org.nats.spring.Subscribe;
 import org.springframework.stereotype.Component;
 
@@ -13,16 +15,22 @@ public class MyBean {
 	public void setName(String name) { this.name = name; }
 	public String getAddr() { return addr; }
 	public void setAddr(String addr) { this.addr = addr; }
-	
-	// Subscription by text
-	@Subscribe("foo,woo")
-	public void handleMessageByText(String subject, String message) {
-		System.out.println("MyBean1 Received (by text=" + subject + ") : " + message);
+
+	// Publishing a message with @Key parameter as key and returned String as value
+	@Publish
+	public String publishWithAnnotation(@Key String key) {
+		return "Japan";
 	}
 	
-	// Subscription by bean attributes
+	// Subscription by multiple static text values
+	@Subscribe("foo,woo.hoo")
+	public void receiveByText(String subject, String message) {
+		System.out.println("MyBean Received (by text=" + subject + ") : " + message);
+	}
+	
+	// Subscription by multiple bean attributes
 	@Subscribe(attr="name,addr")
-	public void handleMessageByAttr(String subject, String message) {
-		System.out.println("MyBean1 Received (by attribute=" + subject + ") : " + message);
-	}
+	public void receiveByAttr(String subject, String message) {
+		System.out.println("MyBean Received (by attribute=" + subject + ") : " + message);
+	}	
 }

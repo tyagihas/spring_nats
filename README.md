@@ -1,5 +1,5 @@
 # Spring_Nats
-Spring implementation for [NATS messaging system](http://nats.io). Java Bean instances can communicate each other locally or remotely based on roboust messaging system.
+Spring implementation for [NATS messaging system](http://nats.io). Annotated Java Bean instances can communicate each other based on roboust NATS messaging system.
 
 ## Getting Started
 
@@ -9,7 +9,7 @@ Adding dependency to Maven pom.xml
 <dependency>
 	<groupId>com.github.tyagihas</groupId>
 	<artifactId>spring_nats</artifactId>
-	<version>0.1</version>
+	<version>0.2</version>
 </dependency>
 ```
 
@@ -20,6 +20,7 @@ application-context.xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <beans xmlns=...>
 	
+	<aop:aspectj-autoproxy proxy-target-class="true" />
 	<nats:config uri="nats://server1:4222" />
 	    
 	<bean id="myBean" class="org.nats.spring.beans.MyBean">
@@ -38,17 +39,23 @@ public class MyBean {
 	private String addr; 
 	
 	...
+
+	// Publishing a message with the parameter with @Key annotation as key and returned String as value
+	@Publish
+	public String publishWithAnnotation(@Key String key) {
+		return "Japan";
+	}
 	
-	// Subscription by text
-	@Subscribe("foo,woo")
-	public void handleMessageByText(String subject, String message) {
-		System.out.println("MyBean1 Received (by text=" + subject + ") : " + message);
+	// Subscription by multiple static text values
+	@Subscribe("foo,woo.hoo")
+	public void receiveByText(String subject, String message) {
+		System.out.println("MyBean Received (by text=" + subject + ") : " + message);
 	}
 	
 	// Subscription by bean attributes
 	@Subscribe(attr="name,addr")
-	public void handleMessageByAttr(String subject, String message) {
-		System.out.println("MyBean1 Received (by attribute=" + subject + ") : " + message);
+	public void receiveByAttr(String subject, String message) {
+		System.out.println("MyBean Received (by attribute=" + subject + ") : " + message);
 	}
 }
 
@@ -56,7 +63,38 @@ public class MyBean {
 MyBean bean = (MyBean)context.getBean("myBean");
 NatsBeanProcessor nats = (NatsBeanProcessor) context.getBean("nats");
 
-nats.unsubscribe(bean, "name,addr");
+nats.unsubscribe(bean, "name");
+nats.unsubscribe(bean, "addr");
+```
+
+### Wildcard Subscriptions
+```java
+public class MyBean2 {
+	...
+	
+	// Wildcard Subscription
+	@Subscribe("foo.*.baz")
+	public void receiveByText1(String subject, String message) {
+		System.out.println("MyBean2 Received (by text=" + subject + ") : " + message);
+	}
+
+	@Subscribe("foo.bar.*")
+	public void receiveByText2(String subject, String message) {
+		System.out.println("MyBean2 Received (by text=" + subject + ") : " + message);
+	}
+
+	@Subscribe("*.bar.*")
+	public void receiveByText3(String subject, String message) {
+		System.out.println("MyBean2 Received (by text=" + subject + ") : " + message);
+	}
+
+	// ">" matches any length of the tail of a subject, and can only be the last token
+	// E.g. 'foo.>' will match 'foo.bar', 'foo.bar.baz', 'foo.foo.bar.bax.22'
+	@Subscribe("foo.>")
+	public void receiveByText4(String subject, String message) {
+		System.out.println("MyBean2 Received (by text=" + subject + ") : " + message);
+	}
+}
 ```
 
 ### Clustered Usage
@@ -72,44 +110,39 @@ nats.unsubscribe(bean, "name,addr");
 ## Advanced Usage
 
 ```java
-// Broadcasting a single message to multiple Bean instances (subscribers)  
-public class MyBean {
-	...
-
-	// Subscription by text
-   	@Subscribe("foo")
-   	public void handleMessageByText(String subject, String message) {
-		System.out.println("Received : " + message);
-	}	
-}
-
-public class MyBean2 {
-	...
-
-	// Subscription by text
-   	@Subscribe("foo")
-   	public void handleMessageByText(String subject, String message) {
-		System.out.println("Received : " + message);
-	}	
-}
-
-// Subscription expires based on timeout or number of processed messages 
+// Subscription expires based on timeout OR number of processed messages 
 public class MyBean2 {
 	...
 
 	@Subscribe(value="hoo", timeout=10, limit=5)
-	public void handleMessageAutoUnsub(String subject, String message) {
+	public void receiveAutoUnsub(String subject, String message) {
 		System.out.println("MyBean2 Received : " + message);
 	}
 }	
 
-// Sending a request and receiving a response from a subscriber
+// Sending a request to a helper bean and receiving a response
 public class MyBean2 {
 	...
 
+	// Sending a request to subscribers
 	@Request("help")
-	public void handleRequest(String response) {
+	public void sendRequest(String response) {
 		System.out.println("MyBean2 Got a response for help : " + response);
+	}
+}
+
+// Helper bean
+@Component
+public class Helper {
+	private NatsBeanProcessor nats;
+	
+	@Autowired
+	public Helper(NatsBeanProcessor nats) {this.nats = nats;}
+	
+	// Listening for help request
+	@Subscribe("help")
+	public void replyToHelp(String subject, String reply, String message) throws IOException {
+		nats.getDefaultConnection().publish(reply, "I can help you!");
 	}
 }
 ```
