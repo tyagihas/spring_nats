@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
 @Component
 @Aspect
 public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextAware, InitializingBean {
-	private static final String VERSION = "0.2";
+	private static final String VERSION = "0.2.1";
 	
 	private String uri;
 	private boolean reconnect;
@@ -73,16 +73,16 @@ public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextA
 		Object result = pjp.proceed();
 
 		MethodSignature sig = (MethodSignature) pjp.getSignature();
-        Class<?> cls = sig.getDeclaringType();
-        Method method = cls.getDeclaredMethod(sig.getName(), sig.getParameterTypes());
-        Parameter[] params = method.getParameters();
-        for(int i = 0; i < params.length; i++) {
-        	if (params[i].getAnnotation(Key.class) != null) {
-        		conn.publish((String)pjp.getArgs()[i], (String)result);
-        		break;
-        	}
-        }        
-
+		Class<?> cls = sig.getDeclaringType();
+		Method method = cls.getDeclaredMethod(sig.getName(), sig.getParameterTypes());
+		Parameter[] params = method.getParameters();
+		for(int i = 0; i < params.length; i++) {
+			if (params[i].getAnnotation(Key.class) != null) {
+				conn.publish((String)pjp.getArgs()[i], (String)result);
+				break;
+			}
+		}        
+		
 		return result;	
 	}
 	
@@ -131,23 +131,23 @@ public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextA
 		}
 		handler.setSid(conn.subscribe(subject, props, handler));
 		handler.setMethod(method);
-		handler.bean = bean;
-		handler.sub = sub;
-		handler.subject = subject;
+		handler.setBean(bean);
+		handler.setSub(sub);
+		handler.setSubject(subject);
 		final String key = bean.toString() + "_" + subject;
 		handlers.put(key, handler);
 			
-		if (handler.sub.timeout() > 0) {
+		if (handler.getSub().timeout() > 0) {
 			beanTimer.schedule(new TimerTask() {
 				public void run() {
 					try {
-						unsubscribe(handler.sid);
+						unsubscribe(handler.getSid());
 						handlers.remove(key);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				}
-			}, handler.sub.timeout() * 1000);
+			}, handler.getSub().timeout() * 1000);
 		}		
 	}
 
@@ -177,7 +177,7 @@ public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextA
 			if (handler == null)
 				throw new UnknownSubscriptionException("Unknown subject : " + subject);
 		}
-		unsubscribe(handler.sid);
+		unsubscribe(handler.getSid());
 		handlers.remove(key);
 	}
 

@@ -5,7 +5,7 @@
 	<groupId>com.github.tyagihas</groupId>
 	<artifactId>spring_nats</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1</version>
+	<version>0.2.1</version>
 	<name>Spring Nats Client</name>
 	<description>Spring client for Nats</description>
 	<url>https://github.com/tyagihas/spring_nats.git</url>

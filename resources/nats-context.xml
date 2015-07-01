@@ -16,7 +16,7 @@
 	<context:annotation-config />
 	<aop:aspectj-autoproxy proxy-target-class="true" />
 	
-	<nats:config uri="nats://54.65.201.125:4222" />
+	<nats:config uri="nats://server1:4222" />
 		
     <bean id="myBean" class="org.nats.spring.beans.MyBean">
     	<property name="name" value="Teppei" />
