@@ -24,6 +24,12 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+/**
+ * NatsBeanProcessor identifies NATS related annotations upon bean creation time as well as run time and 
+ * takes appropriate actions to communicate with NATS server. 
+ * 
+ * @author Teppei Yagihashi
+ */
 @Component
 @Aspect
 public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextAware, InitializingBean {
@@ -68,6 +74,10 @@ public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextA
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
 	}
 	
+	/*
+	 * A Call to @Publish annotated methods is intercepted and a parameter with @Key annotation is
+	 * treated as a key and returned String from the method as a value.  
+	 */ 
 	@Around("execution(@org.nats.spring.Publish String *(.., @org.nats.spring.Key (*), ..))")
 	public Object publish(ProceedingJoinPoint pjp) throws Throwable {
 		Object result = pjp.proceed();
@@ -93,6 +103,7 @@ public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextA
 			for (Method method : bean.getClass().getMethods()) {
 				Subscribe sub = AnnotationUtils.findAnnotation(method, Subscribe.class);
 				if (sub != null) {
+					// Attribute based subscription has higher priority.
 					isAttr = StringUtils.hasText(sub.attr());
 					for(String s : (isAttr) ? sub.attr().split(sub.delimiter()) : sub.value().split(sub.delimiter()))
 						subscribe((isAttr ? extractAttr(bean, s) : s), bean, method, sub);	
@@ -111,6 +122,9 @@ public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextA
 		return bean;
 	}
 	
+	/*
+	 * Extracting values of attributes with bean setter method
+	 */
 	private String extractAttr(Object bean, String attr) {
 		Method getter;
 		try {
@@ -151,6 +165,9 @@ public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextA
 		}		
 	}
 
+	/*
+	 * Associating a method to a standard message handler for @Request annotation
+	 */
 	private void request(String subject, final Object bean, final Method method, Request req) throws IOException {
 		conn.request(subject, new MsgHandler() {
 			public void execute(String response) {
@@ -168,6 +185,9 @@ public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextA
 		return bean;
 	}
 	
+	/*
+	 * Provide subject based unsubscribing API since subject ID is hidden from outside of the bean processor. 
+	 */
 	public void unsubscribe(Object bean, String subject) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException, UnknownSubscriptionException {
 		String key = bean.toString() + "_" + subject;
 		BeanMsgHandler handler = handlers.get(key);
@@ -181,7 +201,7 @@ public class NatsBeanProcessor implements BeanPostProcessor, ApplicationContextA
 		handlers.remove(key);
 	}
 
-	public void unsubscribe(Integer sid) throws IOException {
+	private void unsubscribe(Integer sid) throws IOException {
 		conn.unsubscribe(sid);
 	}
 }

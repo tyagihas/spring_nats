@@ -1,0 +1,4 @@
+org.nats.spring
+org.nats.spring.beans
+org.nats.spring.examples
+org.nats.spring.xml

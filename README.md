@@ -10,7 +10,7 @@ Adding dependency to Maven pom.xml
 <dependency>
 	<groupId>com.github.tyagihas</groupId>
 	<artifactId>spring_nats</artifactId>
-	<version>0.2</version>
+	<version>0.2.1</version>
 </dependency>
 ```
 

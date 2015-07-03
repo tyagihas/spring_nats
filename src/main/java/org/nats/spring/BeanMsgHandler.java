@@ -5,6 +5,12 @@ import java.lang.reflect.Method;
 
 import org.nats.MsgHandler;
 
+/*
+ * BeanMsgHandler is a message handler attached to a bean method for subscription. It maintains subscription
+ * details internally.
+ * 
+ * @author Teppei Yagihashi
+ */
 public class BeanMsgHandler extends MsgHandler {
 			
 	private Integer sid;
