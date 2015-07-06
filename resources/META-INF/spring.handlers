@@ -1,1 +1,1 @@
-http\://github.com/tyagihas/spring_nats/schema/nats=org.nats.spring.xml.NatsNamespaceHandler
+https\://github.com/tyagihas/spring_nats/schema/nats=org.nats.spring.xml.NatsNamespaceHandler
