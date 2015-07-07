@@ -1,9 +1,8 @@
 # Spring_Nats
-Spring implementation for [NATS messaging system](http://nats.io).  
-Annotated Java Bean instances can communicate each other based on robust NATS messaging system.  
+Spring implementation for [NATS messaging system](http://nats.io). Annotated Java Bean instances can communicate each other based on robust NATS messaging system.  
   
 Following method annotations are available in Spring_Nats :  
-* @Publish : When a bean method is invoked, publish a message with a @Key annotated parameter as a key and returend String as a value. The annotation is evaluated upon every method invocation.
+* @Publish : When a bean method is invoked, publish a message with a @Key annotated parameter as a key and returned String as a value. The annotation is evaluated upon every method invocation.
 * @Subscribe : Subscribe to a subject which can be specified as a plain text or a bean attribute. This annotation is only evaluated during bean creation time.
 * @Request : Send a request to subscribers for a response. Request string can be specified as a plain text or a bean attribute. This annotation is only evaluated during bean creation time.
 
