@@ -9,7 +9,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 public class Request {
 
 	public static void main(String[] args) throws Exception {
-		ApplicationContext context = new FileSystemXmlApplicationContext("./resources/nats-context.xml");
+		ApplicationContext context = new FileSystemXmlApplicationContext("./nats-context.xml");
 
 		Helper helper = (Helper)context.getBean("helper");
 		MyBean2 bean2 = (MyBean2)context.getBean("myBean2");

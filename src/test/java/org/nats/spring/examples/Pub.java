@@ -8,7 +8,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 public class Pub {
 
 	public static void main(String[] args) throws Exception {
-		ApplicationContext context = new FileSystemXmlApplicationContext("./resources/nats-context.xml");
+		ApplicationContext context = new FileSystemXmlApplicationContext("./nats-context.xml");
 		
 		MyBean bean = (MyBean)context.getBean("myBean");		
 		MyBean2 bean2 = (MyBean2)context.getBean("myBean2");		

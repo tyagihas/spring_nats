@@ -12,7 +12,7 @@ public class SubUnsub {
 
 	public static void main(String[] args) throws Exception {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-		ApplicationContext context = new FileSystemXmlApplicationContext("./resources/nats-context.xml");
+		ApplicationContext context = new FileSystemXmlApplicationContext("./nats-context.xml");
 
 		MyBean bean = (MyBean)context.getBean("myBean");
 		bean.publishWithAnnotation("Tokyo");

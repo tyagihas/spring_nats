@@ -11,7 +11,7 @@ public class Expire {
 
 	public static void main(String[] args) throws Exception {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-		ApplicationContext context = new FileSystemXmlApplicationContext("./resources/nats-context.xml");
+		ApplicationContext context = new FileSystemXmlApplicationContext("./nats-context.xml");
 		
 		MyBean2 bean2 = (MyBean2)context.getBean("myBean2");
 		
